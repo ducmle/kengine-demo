@@ -1,13 +1,5 @@
 # KEngine
-## Version: 4.0
 
-Implement version 4.0 of the keyword search engine.
+Implement the keyword search engine.
 
-- Scope: design iteration 2, part 3
-- Components:
-  - Engine: completed
-  - Query: completed
-  - Sorting: completed
-  - DocCnt: completed (implement Comparable)
-
-
+Create 4 versions as 4 separate branches.
