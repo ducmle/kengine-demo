@@ -103,7 +103,7 @@ public class Doc {
    *          This implementation also parses the Javascript text that is
    *          contained between the <code>&lt;script&gt;&lt;/script&gt;</code>
    *          tags.
-   * @version 3.0: added this method
+   * @version 1.0: stub operation
    */
   public Iterator words() {
     // stub
