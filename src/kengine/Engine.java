@@ -6,10 +6,9 @@ import java.util.Vector;
 
 import kengine.Comm;
 import kengine.Doc;
-import kengine.Query;
-import kengine.WordTable;
+import kengine.Helpers;
+import kengine.TitleTable;
 import utils.NotPossibleException;
-
 
 /**
  * @overview An engine has a state as described in the search engine data model. 
@@ -20,7 +19,7 @@ import utils.NotPossibleException;
  * 
  * @see "Program Development in Java", pgs: 313, 316-323, 365
  * 
- * @version 2.0 
+ * @version 4.0 implement the full logic
  * @author dmle
  *
  */
@@ -28,6 +27,7 @@ public class Engine {
   private TitleTable tt;
   private WordTable wt;
   private Query q;
+  
   //dmle: use Vector instead of array to ease maintenance  
   // private String[] urls;
   private Vector urls;
@@ -54,18 +54,18 @@ public class Engine {
    * @effects   if <code>w</code> is not a word or <code>w</code> is an uninteresting word 
    *            then throws <code>NotPossibleException</code>, else returns 
    *            a <code>Query</code> object containing the documents matching the keyword
-   * @version 1.0 returns empty <code>Query</code> object since all words are assumed uninteresting
+   * @version 4.0
    */
   public Query queryFirst(String w) throws NotPossibleException {
-    // canonical form
-    String cw = Helpers.canon(w);
+    if (w != null)
+      w = Helpers.canon(w);
     
     // check w
-    if (wt.lookup(cw) == null) {
+    if (wt.lookup(w) == null) {
       throw new NotPossibleException("Engine.queryFirst: the specified word is either not found in any documents or uninteresting: " + w);
     }
     
-    q = new Query();
+    q = new Query(wt, w);
     return q;
   }
   
@@ -77,18 +77,19 @@ public class Engine {
    * @effects   if <code>w</code> is not a word or <code>w</code> is an uninteresting word 
    *            then throws <code>NotPossibleException</code>, else returns 
    *            an updated <code>Query</code> object containing the documents matching all keywords
-   * @version 2.0 returns empty <code>Query</code> object since all words are assumed uninteresting
+   * @version 4.0
    */
   public Query queryMore(String w) throws NotPossibleException {
-    // canonical form
-    String cw = Helpers.canon(w);
-
+    if (w != null)
+      w = Helpers.canon(w);
+    
     // check w
-    if (wt.lookup(cw) == null) {
+    if (wt.lookup(w) == null) {
       throw new NotPossibleException("Engine.queryMore: the specified word is either not found in any documents or uninteresting: " + w);
     }
 
-    q = new Query();
+    q.addKey(w);
+    
     return q;
   }
   
@@ -122,7 +123,7 @@ public class Engine {
    *            respective methods. If no query was in progress then return an empty
    *            <code>Query</code> object, else returns an updated object that contains 
    *            any matching new documents.
-   * @version 1.0  returns empty <code>Query</code> object since all keywords are assumed uninteresting
+   * @version 4.0  add each new document to the current query (if one exists)
    */
   public Query addDocs(String u) throws NotPossibleException {
     if (urls.contains(u)) 
@@ -135,12 +136,10 @@ public class Engine {
     Hashtable h;
     while (docs.hasNext()) {
       d = (Doc) docs.next();
+      //addDoc(d);
       tt.addDoc(d);
       h = wt.addDoc(d);
       
-      // debug
-      System.out.println("added: " + d.title());
-
       if (q != null) {        
         q.addDoc(d, h);
       }
@@ -162,7 +161,29 @@ public class Engine {
    * @effects return a string containing all none-keywords
    * @note this method is not in the original design of this class
    */
-  public String getNonkeys() {   
+  public String[] getNonkeys() {   
     return wt.getNonkeys();
+  }
+  
+  /**
+   * A method to return the displayable content of the word table as string.
+   *  
+   * @effects return a string containing all the words and their <code>DocCnt</code> objects
+   * @note this method is not in the original design of this class
+   */
+  public String getWordTableAsString() {
+    return wt.toString();
+  }
+  
+  /**
+   * @effects Reinitialise <code>this</code> to the initial state (e.g. containing
+   *          only the initial set of non-interesting words)
+   * @version 3.0
+   */
+  public void reset() {
+    tt.reset();
+    wt.reset();
+    urls.clear();
+    q = null;
   }
 }
