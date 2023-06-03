@@ -1,8 +1,10 @@
 # KEngine
 
-Implement version 2.0 of the keyword search engine.
+Implement version 4.0 of the keyword search engine.
 
-- Scope: design iteration 2: part 1
+- Scope: design iteration 2: part 3
 - Components:
-  - TitleTable: completed
-  - Helpers: completed
+  - Engine: completed
+  - Query
+  - Sorting
+  - DocCnt: completed, implement Comparable
